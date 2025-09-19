@@ -1,0 +1,15 @@
+#+TITLE: Starship Prompt for EShell
+
+The [[https://starship.rs][starship prompt]] is a cross-platform shell prompt written in rust. This package provides integration to use this within =eshell=.
+
+* Installation
+To use this package, install starship and set your default font in Emacs to be a [[https://www.nerdfonts.com][Nerd Font]]. Then, run =eshell-starship-setup= to enable the starship prompt within eshell.
+
+Example use-package incantation with elpaca:
+
+#+begin_src elisp
+(use-package eshell-starship
+  :ensure '(:host github :repo "siddharthverma314/eshell-starship")
+  :config
+  (eshell-starship-setup))
+#+end_src
