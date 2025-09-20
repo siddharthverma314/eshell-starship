@@ -36,6 +36,8 @@
 
 (require 'ansi-color)
 (require 'eshell)
+(require 'em-term)
+(require 'em-prompt)
 (require 'map)
 
 (defgroup eshell-starship nil
@@ -94,10 +96,10 @@ previously set eshell prompt function."
          (buffer-string)))
     ('file-missing
      (warn "Starship program %s not found" eshell-starship-command)
-     (funcall eshell-starship--default-prompt-function)))))
+     (funcall eshell-starship--default-prompt-function))))
 
 (defun eshell-starship-setup ()
-  "Setup eshell for use with starship."
+  "Setup starship prompt for use within eshell."
   (interactive)
   ;; save previous prompt function
   (setq eshell-starship--default-prompt-function eshell-prompt-function)
