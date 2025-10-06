@@ -55,6 +55,11 @@ Note that the emacs default TERM=dumb is not supported by starship."
   :type 'string
   :group 'eshell-starship)
 
+(defcustom eshell-starship-config (expand-file-name "~/.config/starship.toml")
+  "Starship config to use."
+  :type 'file
+  :group 'eshell-starship)
+
 ;; eshell command time tracking
 (defvar-local eshell-starship--last-cmd-time nil
   "An alist containing start and end times of the last run eshell command.")
@@ -85,15 +90,21 @@ Prompt is returned as an ansi escaped string. If
 previously set eshell prompt function."
   (condition-case nil
       (ansi-color-apply
-       (with-temp-buffer
-         (with-environment-variables (("TERM" eshell-starship-term))
-           (call-process
-            eshell-starship-command nil t nil
-            "prompt"
-            (format "--status=%d" eshell-last-command-status)
-            (format "--terminal-width=%d" (window-width))
-            (format "--cmd-duration=%d" (eshell-starship--elasped-millis))))
-         (buffer-string)))
+       ;; session key is derived from buffer-name which is unique
+       (let ((eshell-starship-session-key (md5 (buffer-name))))
+         (with-temp-buffer
+           (with-environment-variables
+               (("TERM" eshell-starship-term)
+                ("STARSHIP_CONFIG" eshell-starship-config)
+                ("STARSHIP_SESSION_KEY" eshell-starship-session-key)
+                ("STARSHIP_SHELL" "eshell"))
+             (call-process
+              eshell-starship-command nil t nil
+              "prompt"
+              (format "--status=%d" eshell-last-command-status)
+              (format "--terminal-width=%d" (window-width))
+              (format "--cmd-duration=%d" (eshell-starship--elasped-millis))))
+           (buffer-string))))
     ('file-missing
      (warn "Starship program %s not found" eshell-starship-command)
      (funcall eshell-starship--default-prompt-function))))
